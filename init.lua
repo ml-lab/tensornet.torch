@@ -92,7 +92,7 @@ function TensorTrain:updateGradInput(input, gradOutput)
 	    leftISize = torch.prod(W.n(1:derDim-1))
 		rightISize = torch.prod(W.n(derDim+1:end))
 
-		currout.dzdx = out.dzdx:view(leftISize, W.n[derDim], rightISize*batchSize)
+		currout.dzdx = self.gradInput:view(leftISize, W.n[derDim], rightISize*batchSize)
 
 		currout.dzdx = currout.dzdx:permute(2, 1, 3)
 		sumSize = leftISize * rightISize * batchSize
