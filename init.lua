@@ -2,7 +2,7 @@ require 'nn'
 
 local TensorTrain, parent = torch.class('nn.TensorTrain', 'nn.Module')
 
-function TensorTrain:__init()
+function TensorTrain:__init(outChannels, outHeight, outWidth)
 	parent.__init(self)
 
 	self.weight = torch.Tensor()
@@ -10,14 +10,12 @@ function TensorTrain:__init()
 	self.gradWeight = torch.Tensor()
 	self.gradBias = torch.Tensor()
 
-	self.outHeight = nil
-	self.outWidth = nil
-	self.outChannels = nil
+	self.outHeight = outHeight
+	self.outWidth = outWidth
+	self.outChannels = outChannels
 
 	--TODO: should the constructor arguments resemble Linear or SpatialConvolution?
 	--TODO all operations regarding W, tt_transpose, tt_multiply, tt_rank, core2cell
-	--TODO: vector indexing
-	--TODO: what's currout.dzdx, does it have anything to do with in.dzdx
 	--TODO: self:reset()
 end
 
