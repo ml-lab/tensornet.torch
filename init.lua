@@ -77,10 +77,10 @@ function TensorTrain:addGradParameters(input, gradOutput, scale)
 			local core = coreArr[derDim-1]:permute(1, 2, 4, 3)
 			core = core:view(-1, W.m[derDim-1])
 
-			leftSum = rightSum:view(rankArr[derDim+1]*torch.prod(W.n(derDim+1:end))*batchSize*torch.prod(W.m:narrow(1, 1, (derDim-2) - (1) + 1)), torch.prod(W.m:narrow(1, derDim-1, (derDim) - (derDim-1) + 1)))
+			leftSum = rightSum:view(rankArr[derDim+1]*torch.prod(W.n:narrow(1, derDim+1, W.n:size(1) - (derDim+1) + 1))*batchSize*torch.prod(W.m:narrow(1, 1, (derDim-2) - (1) + 1)), torch.prod(W.m:narrow(1, derDim-1, (derDim) - (derDim-1) + 1)))
 	        	leftSum = core * leftSum:t():view(W.m[derDim-1], -1)
 
-			local leftSumDims = torch.LongStorage{rankArr[derDim-1]*W.n[derDim-1], rankArr[derDim]*W.m[derDim]*rankArr[derDim+1], torch.prod(W.n(derDim+1:end))*batchSize, torch.prod(W.m:narrow(1, 1, (derDim-2) -(1) + 1))}
+			local leftSumDims = torch.LongStorage{rankArr[derDim-1]*W.n[derDim-1], rankArr[derDim]*W.m[derDim]*rankArr[derDim+1], torch.prod(W.n:narrow(1, derDim+1, W.n:size(1) - (derDim+1) + 1))*batchSize, torch.prod(W.m:narrow(1, 1, (derDim-2) -(1) + 1))}
 	        	leftSum = leftSum:view(leftSumDims)
 		    	leftSum = leftSum:permute(1, 3, 2, 4)
 
@@ -99,7 +99,7 @@ function TensorTrain:addGradParameters(input, gradOutput, scale)
 		
 		local coreSize = rankArr[derDim] * W.n[derDim] * W.m[derDim] * rankArr[derDim+1]
 	    	local leftISize = torch.prod(W.n:narrow(1, 1, (derDim-1) -(1) + 1))
-		local rightISize = torch.prod(W.n(derDim+1:end))
+		local rightISize = torch.prod(W.n:narrow(1, derDim+1, W.n:size(1) - (derDim+1) + 1))
 
 		local currout_dzdx = self.gradInput:view(leftISize, W.n[derDim], rightISize*batchSize)
 
