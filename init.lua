@@ -77,10 +77,10 @@ function TensorTrain:addGradParameters(input, gradOutput, scale)
 			local core = coreArr[derDim-1]:permute(1, 2, 4, 3)
 			core = core:view(-1, W.m[derDim-1])
 
-			leftSum = rightSum:view(rankArr[derDim+1]*torch.prod(W.n:narrow(1, derDim+1, W.n:size(1) - (derDim+1) + 1))*batchSize*torch.prod(W.m:narrow(1, 1, (derDim-2) - (1) + 1)), torch.prod(W.m:narrow(1, derDim-1, (derDim) - (derDim-1) + 1)))
+			leftSum = rightSum:view(rankArr[derDim+1]*torch.prod(W.n:sub(derDim+1, -1))*batchSize*torch.prod(W.m:sub(1, derDim-2)), torch.prod(W.m:sub(derDim-1, derDim)))
 	        	leftSum = core * leftSum:t():view(W.m[derDim-1], -1)
 
-			local leftSumDims = torch.LongStorage{rankArr[derDim-1]*W.n[derDim-1], rankArr[derDim]*W.m[derDim]*rankArr[derDim+1], torch.prod(W.n:narrow(1, derDim+1, W.n:size(1) - (derDim+1) + 1))*batchSize, torch.prod(W.m:narrow(1, 1, (derDim-2) -(1) + 1))}
+			local leftSumDims = torch.LongStorage{rankArr[derDim-1]*W.n[derDim-1], rankArr[derDim]*W.m[derDim]*rankArr[derDim+1], torch.prod(W.n:sub(derDim+1, -1))*batchSize, torch.prod(W.m:sub(1, derDim-2))}
 	        	leftSum = leftSum:view(leftSumDims)
 		    	leftSum = leftSum:permute(1, 3, 2, 4)
 
@@ -98,8 +98,8 @@ function TensorTrain:addGradParameters(input, gradOutput, scale)
 		end
 		
 		local coreSize = rankArr[derDim] * W.n[derDim] * W.m[derDim] * rankArr[derDim+1]
-	    	local leftISize = torch.prod(W.n:narrow(1, 1, (derDim-1) -(1) + 1))
-		local rightISize = torch.prod(W.n:narrow(1, derDim+1, W.n:size(1) - (derDim+1) + 1))
+	    	local leftISize = torch.prod(W.n:sub(1, derDim-1))
+		local rightISize = torch.prod(W.n:sub(derDim+1, -1))
 
 		local currout_dzdx = self.gradInput:view(leftISize, W.n[derDim], rightISize*batchSize)
 
@@ -109,7 +109,7 @@ function TensorTrain:addGradParameters(input, gradOutput, scale)
 
 		der = der:view(W.n[derDim], rankArr[derDim], W.m[derDim]*rankArr[derDim+1])
 		der = der:permute(2, 1, 3)
-		DZDWCore:narrow(1, corePos[derDim], (corePos[derDim+1]-1) - (corePos[derDim]) + 1) = der
+		DZDWCore:sub(corePos[derDim], corePos[derDim+1]-1) = der
 
 		self.gradWeight = DZDWCore
 	end
