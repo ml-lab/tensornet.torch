@@ -166,7 +166,6 @@ function TensorTrain:accGradParameters(input, gradOutput, scale)
 		der = torch.view(der, W.n[derDim], rankArr[derDim], W.m[derDim]*rankArr[derDim+1])
 		der = torch.permute(der, 2, 1, 3)
 		DZDWCore:sub(corePos[derDim], corePos[derDim+1]-1) = der
-
-		self.gradWeight = DZDWCore
 	end
+	self.gradWeight = DZDWCore
 end
